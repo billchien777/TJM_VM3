@@ -18,7 +18,7 @@ app.post('/api/upload', upload.single('video'), async (req, res) => {
         return res.status(400).json({ error: 'No video file uploaded' });
     }
     const inputPath = req.file.path;
-    const outputPath = \public/processed/\.mp4\;
+    const outputPath = `public/processed/${req.file.filename}.mp4`;
 
     // 使用 FFmpeg 進行自動標準化剪輯 (例如轉為 720p 節省算力)
     ffmpeg(inputPath)
@@ -38,15 +38,15 @@ app.post('/api/upload', upload.single('video'), async (req, res) => {
                     url: outputPath
                 };
                 
-                res.json({ message: '上傳並自動分類成功', data: videoData });
+                res.json({ message: "上傳並自動分類成功", data: videoData });
             } catch (err) {
                 console.error('AI Service Error:', err.message);
-                res.status(500).json({ error: 'AI 分類失敗', details: err.message });
+                res.status(500).json({ error: "AI 分類失敗", details: err.message });
             }
         })
         .on('error', (err) => {
             console.error('FFmpeg Error:', err);
-            res.status(500).json({ error: 'Video processing failed' });
+            res.status(500).json({ error: "Video processing failed" });
         });
 });
 
@@ -55,17 +55,17 @@ app.post('/api/access', async (req, res) => {
     const { userAddress, videoId } = req.body;
     // 呼叫 VM 2 的 Bridge 檢查點數或勳章
     try {
-        const response = await axios.get(\http://VM2_IP:3000/user/\/stats\);
+        const response = await axios.get(`http://VM2_IP:3000/user/${userAddress}/stats`);
         
         // 假設影片需要特定勳章
         if (response.data.hasMedal) {
-            res.json({ access: true, streamUrl: '...' });
+            res.json({ access: true, streamUrl: "..." });
         } else {
-            res.json({ access: false, reason: '勳章等級不足' });
+            res.json({ access: false, reason: "勳章等級不足" });
         }
     } catch (err) {
-         res.status(500).json({ error: 'Access check failed', reason: err.message });
+        res.status(500).json({ error: 'Access check failed', reason: err.message });
     }
 });
 
-app.listen(4000, () => console.log(' 藏經閣後端啟動於 Port 4000'));
+app.listen(4000, () => console.log('🚀 藏經閣後端啟動於 Port 4000'));
